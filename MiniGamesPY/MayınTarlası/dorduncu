@@ -1,0 +1,66 @@
+import random
+
+
+def tahtaOlsuturucu():
+    tahtasi = [["-" for _ in range(5)] for _ in range(5)]
+    mayinlar = set()
+    while len(mayinlar) < 5:
+        mayin = (random.randint(0, 4), random.randint(0, 4))
+        mayinlar.add(mayin)
+    return tahtasi, mayinlar
+
+def showTahta(tahta):
+    print("\n   0  1  2  3  4")
+    print("  ----------------")
+    for i, satir in enumerate(tahta):
+        print(f"{i} | " + "  ".join(satir))
+
+def cevreKontrol(koordinat, mayinlar):
+    x, y = koordinat
+    cevre_koordinatlari = [
+        (x + dx, y + dy) for dx, dy in 
+        [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        if 0 <= x + dx < 5 and 0 <= y + dy < 5
+    ]
+    return sum(1 for k in cevre_koordinatlari if k in mayinlar)
+
+def mayinTarlasi():
+    tahta, mayinlar = tahtaOlsuturucu()
+    ziyaret_edilenler = set()
+
+    print("Mayın Tarlası Oyununa Hoş Geldiniz! 🎉")
+    print("5x5'lik bir tahtada 5 mayın var. Bir mayına basmadan ilerlemeye çalışın!")
+    showTahta(tahta)
+
+    while True:
+        try:
+            koordinat = input("Koordinat seçin (örnek: 1,2): ")
+            x, y = map(int, koordinat.split(","))
+            if not (0 <= x < 5 and 0 <= y < 5):
+                print("Geçerli bir koordinat girin (0-4 arası).")
+                continue
+        except ValueError:
+            print("Koordinatlar doğru formatta değil! Örnek: 1,2")
+            continue
+
+        if (x, y) in ziyaret_edilenler:
+            print("Bu hücreyi zaten seçtiniz!")
+            continue
+
+        if (x, y) in mayinlar:
+            print("\n💥 Mayına bastınız! Oyun bitti. 💥")
+            for mx, my in mayinlar:
+                tahta[mx][my] = "*"
+            showTahta(tahta)
+            break
+
+        ziyaret_edilenler.add((x, y))
+        mayin_sayisi = cevreKontrol((x, y), mayinlar)
+        tahta[x][y] = str(mayin_sayisi)
+        showTahta(tahta)
+
+        if len(ziyaret_edilenler) + len(mayinlar) == 25:
+            print("\n🎉 Tebrikler! Tüm güvenli hücreleri açtınız! 🎉")
+            break
+
+mayinTarlasi()
